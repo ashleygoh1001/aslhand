@@ -1,4 +1,5 @@
 import { BuildManual } from '../components/BuildManual'
+import { ManualBook } from '../components/ManualBook'
 import { SectionHeading } from '../components/SectionHeading'
 import { manualParts } from '../data/manual'
 
@@ -9,9 +10,17 @@ export function BuildManualPage() {
         <SectionHeading
           id="build-manual-heading"
           title="Build Manual"
-          subtitle="Step-by-step instructions from parts checklist through calibration. Expand each part as you work through the build."
+          subtitle="Scroll through the full instruction manual, then expand each build phase below."
         />
-        <BuildManual parts={manualParts} />
+
+        <ManualBook />
+
+        <div className="mt-8 border-t-2 border-pop-ink/10 pt-12">
+          <h3 className="mb-6 text-xl font-bold italic text-pop-teal">
+            Build phases (quick reference)
+          </h3>
+          <BuildManual parts={manualParts} />
+        </div>
       </div>
     </section>
   )

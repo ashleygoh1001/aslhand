@@ -9,7 +9,7 @@ A multi-page site to help Dartmouth students build a 3D-printed robotic hand tha
 | `/` | Home / project overview |
 | `/demo` | Demo video |
 | `/how-it-works` | System explainer |
-| `/build-manual` | Step-by-step build guide |
+| `/build-manual` | Scrollable instruction manual (page-turn) + build phases |
 | `/resources` | Dartmouth Resources — 3D printing help & campus map |
 
 ## Quick start
@@ -30,6 +30,14 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## Editing content
 
 All manual text, tables, parts lists, and placeholder links live in **`src/data/manual.ts`**. Update that file to change copy without touching components.
+
+### Instruction manual slides
+
+The Build Manual tab includes a scroll-driven book built from PNGs in **`public/manual-book/`** (44 slides). To replace them after editing the PowerPoint, put `Instructions.pptx` in your Downloads folder (or pass a path) and run:
+
+```bash
+node scripts/export-manual-slides.mjs
+```
 
 ### TODO placeholders to fill in
 

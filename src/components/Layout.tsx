@@ -14,13 +14,13 @@ export function Layout() {
     <>
       <ScrollToTop />
       <Nav />
-      <main className="min-h-[calc(100vh-8rem)] overflow-x-hidden">
+      <main className="min-h-[calc(100vh-8rem)] overflow-x-clip">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduceMotion ? undefined : { opacity: 0 }}
             transition={pageTransition}
           >
             {outlet}

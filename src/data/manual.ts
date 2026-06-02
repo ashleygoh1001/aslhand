@@ -529,3 +529,15 @@ export const dartmouthResources = {
     },
   ] satisfies PrintingLocation[],
 }
+
+/** Slide images exported from Instructions.pptx — re-run scripts/export-manual-slides.mjs to refresh */
+export const manualBook = {
+  title: 'Instruction Manual',
+  subtitle: 'Scroll to turn the pages — your full build presentation from class.',
+  /** vh of scroll height per page (controls how fast pages turn) */
+  scrollHeightPerPage: 40,
+  slides: Array.from({ length: 44 }, (_, i) => ({
+    src: `/manual-book/slide-${String(i + 1).padStart(2, '0')}.png`,
+    alt: `Instruction manual page ${i + 1}`,
+  })),
+}
