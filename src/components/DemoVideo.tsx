@@ -8,7 +8,7 @@ export function DemoVideo() {
 
   return (
     <section
-      className="section-padding bg-gray-50"
+      className="section-padding bg-canvas"
       aria-labelledby="demo-heading"
     >
       <div className="mx-auto max-w-6xl">

@@ -9,7 +9,7 @@ import { SectionHeading } from './SectionHeading'
 
 export function Resources() {
   return (
-    <section className="section-padding bg-gray-50" aria-labelledby="resources-heading">
+    <section className="section-padding bg-canvas" aria-labelledby="resources-heading">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="resources"

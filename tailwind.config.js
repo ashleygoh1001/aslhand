@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        canvas: '#FCFCFB',
         dartmouth: {
           green: '#00693E',
           'green-dark': '#005030',
@@ -12,7 +13,7 @@ export default {
       },
       fontFamily: {
         sans: [
-          'Inter',
+          'Karla',
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',

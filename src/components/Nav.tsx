@@ -37,8 +37,8 @@ export function Nav() {
     <header
       className={`sticky top-0 z-50 border-b transition-shadow ${
         scrolled
-          ? 'border-gray-200 bg-white/95 shadow-sm backdrop-blur'
-          : 'border-transparent bg-white'
+          ? 'border-gray-200 bg-canvas/95 shadow-sm backdrop-blur'
+          : 'border-transparent bg-canvas'
       }`}
     >
       <nav
@@ -102,7 +102,7 @@ export function Nav() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="border-t border-gray-200 bg-white px-4 py-4 md:hidden"
+          className="border-t border-gray-200 bg-canvas px-4 py-4 md:hidden"
         >
           <ul className="flex flex-col gap-1">
             {navLinks.map((link) => (
