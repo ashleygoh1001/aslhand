@@ -53,11 +53,12 @@ function StaticManual({
 function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | null> }) {
   const { scrollYProgress } = useScroll({
     target: scrollRef,
-    // end start: progress hits 1 when the section bottom reaches the viewport top (sticky book pattern)
-    offset: ['start start', 'end start'],
+    // Use end-end so the sticky viewport has full runway
+    offset: ['start start', 'end end'],
   })
 
-  const pageFloat = useTransform(scrollYProgress, (v) => v * total)
+  // Map 0..1 progress to page turns 0..(total-1)
+  const pageFloat = useTransform(scrollYProgress, (v) => v * (total - 1))
 
   const rotateY = useTransform(pageFloat, (p) => {
     const idx = Math.min(total - 1, Math.max(0, Math.floor(p)))
@@ -183,7 +184,8 @@ export function ManualBook() {
 
       <div
         ref={containerRef}
-        style={{ height: `${total * manualBook.scrollHeightPerPage}vh` }}
+        // +100vh gives the sticky book room to finish the last flip
+        style={{ height: `${total * manualBook.scrollHeightPerPage + 100}vh` }}
         className="relative"
       >
         <div className="sticky top-[10vh] z-10 flex h-[80vh] items-center justify-center">
