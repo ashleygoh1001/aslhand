@@ -121,9 +121,9 @@ export const navLinks: NavLink[] = [
   { path: '/resources', label: 'Dartmouth Resources' },
 ]
 
-// TODO: Replace with your real YouTube video ID
 export const demoVideo = {
-  youtubeId: 'dQw4w9WgXcQ', // TODO: paste real YouTube video ID here
+  /** Hosted in public/demo.mov — replace file to update the demo */
+  src: '/demo.mov',
   caption:
     'The hand listens through a USB microphone, transcribes speech on a Raspberry Pi, and drives five servos to curl each finger into ASL fingerspelling shapes.',
 }
@@ -429,12 +429,32 @@ export const toolsList: string[] = [
   'Raspberry Pi Imager (free download)',
 ]
 
+/** Google Drive folder with all hand STL files (Arm, fingers, Left/Right Hand, etc.) */
+export const stlFilesUrl =
+  'https://drive.google.com/drive/folders/1s3dWR7tIZK6eXvIeR3uY36rGJj1A0x3W?usp=drive_link'
+
+export const stlFiles = {
+  label: '3D Print Files (STLs)',
+  description:
+    'Download the Robo Hand STL files (palm, fingers, arm, covers) from here.',
+  href: stlFilesUrl,
+}
+
+/** Printable instruction manual — file in public/instructions-manual.pdf */
+export const pdfManual = {
+  label: 'Printable PDF Manual',
+  description:
+    'Download and print the full instruction manual for offline use in the lab or workshop.',
+  href: '/instructions-manual.pdf',
+  downloadFilename: 'Instructions.pdf',
+}
+
 export const downloads: DownloadItem[] = [
   {
     id: 'stl',
-    label: '3D Print Files (STLs)',
-    description: 'Palm, fingers, servo mounts, and lid — print in PLA at 0.2 mm layer height.',
-    href: '#', // TODO: link to STL zip or GitHub release
+    label: stlFiles.label,
+    description: stlFiles.description,
+    href: stlFiles.href,
   },
   {
     id: 'code',
@@ -444,9 +464,9 @@ export const downloads: DownloadItem[] = [
   },
   {
     id: 'pdf',
-    label: 'Printable PDF Manual',
-    description: 'Full build guide formatted for workshop printing.',
-    href: '#', // TODO: link to PDF file
+    label: pdfManual.label,
+    description: pdfManual.description,
+    href: pdfManual.href,
   },
 ]
 
@@ -473,7 +493,7 @@ export const dartmouthResources = {
   steps: [
     {
       title: 'Review your STL files',
-      body: 'Download the hand print files from the Build Manual downloads section (or your course folder). Check that each part is oriented for minimal supports.',
+      body: 'Download the hand print files from our Google Drive folder (Arm, Finger_Index, Left_Hand, Right_Hand, and more). Check that each part is oriented for minimal supports before slicing.',
     },
     {
       title: 'Pick a printing location',
@@ -499,7 +519,7 @@ export const dartmouthResources = {
         'Ground floor, Class of 1982 Engineering & Computer Science Center (ECSC) — just off the atrium',
       mapEmbedUrl:
         'https://www.google.com/maps?q=Harold+Edward+Cable+Makerspace,+15+Thayer+Drive,+Hanover,+NH+03755&output=embed',
-      websiteHref: 'https://engineering.dartmouth.edu/community/makerspace',
+      websiteHref: 'https://cablemakerspace.dartmouth.edu/',
       websiteLabel: 'Cable Makerspace website',
       highlights: [
         'Prusa MK3S+ 3D printers (PLA)',
@@ -541,3 +561,191 @@ export const manualBook = {
     alt: `Instruction manual page ${i + 1}`,
   })),
 }
+
+export type CopyPasteBlock = {
+  part: number
+  step: number
+  title: string
+  description?: string
+  content: string
+}
+
+/** Copy/paste-friendly coding notes shown under the instruction manual. */
+export const codingCopyPaste: CopyPasteBlock[] = [
+  {
+    part: 1,
+    step: 17,
+    title: 'SSH into the Pi',
+    description: 'Copy/paste this into your terminal to connect.',
+    content: `ashleypi@aslhand.local`,
+  },
+  {
+    part: 1,
+    step: 18,
+    title: 'Update + install dependencies on the Pi',
+    description: 'Paste into your terminal after connecting via SSH.',
+    content: `ashleypi@aslhand.local:~ $ sudo apt update
+ashleypi@aslhand.local:~ $ sudo apt upgrade -y
+ashleypi@aslhand.local:~ $ sudo apt install -y python3-pip i2c-tools portaudio19-dev flac
+`,
+  },
+  {
+    part: 1,
+    step: 19,
+    title: 'Open Raspberry Pi configuration',
+    description: 'Paste into your terminal.',
+    content: `ashleypi@aslhand.local:~ $ sudo raspi-config
+`,
+  },
+  {
+    part: 1,
+    step: 20,
+    title: 'Install Python packages on the Pi',
+    description: 'Paste into your terminal.',
+    content: `ashleypi@aslhand.local:~ $ pip3 install --break-system-packages adafruit-circuitpython-pca9685 adafruit-circuitpython-servokit SpeechRecognition pyaudio
+`,
+  },
+  {
+    part: 1,
+    step: 21,
+    title: 'Test the microphone',
+    description: 'Paste into your terminal.',
+    content: `ashleypi@aslhand.local:~ $ arecord -l
+ashleypi@aslhand.local:~ $ arecord -D plughw:1,0 -d 5 test.wav 
+ashleypi@aslhand.local:~ $ ls -lh test.wav
+
+
+`,
+  },
+  {
+    part: 3,
+    step: 5,
+    title: 'Create the ASL hand script',
+    description: 'Paste into your terminal.',
+    content: `ashleypi@aslhand.local:~ $ nano asl_hand.py
+`,
+  },
+  {
+    part: 3,
+    step: 6,
+    title: 'ASL hand script (paste into nano)',
+    description: 'Copy this entire script, then paste into nano and save.',
+    content: `from adafruit_servokit import ServoKit
+import speech_recognition as sr
+import time
+
+kit = ServoKit(channels=16)
+
+# === CALIBRATED ANGLES — REPLACE WITH YOUR NUMBERS ===
+# Format: (open_angle, closed_angle)
+THUMB  = (30, 150)   # CHANGE THIS
+INDEX  = (30, 150)   # CHANGE THIS
+MIDDLE = (30, 150)   # CHANGE THIS
+RING   = (30, 150)   # CHANGE THIS
+PINKY  = (30, 150)   # CHANGE THIS
+
+CHANNELS = [0, 1, 2, 3, 4]                       # thumb, index, middle, ring, pinky
+RANGES   = [THUMB, INDEX, MIDDLE, RING, PINKY]
+FINGER_NAMES = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
+
+# Each letter is (thumb, index, middle, ring, pinky)
+# 0 = open/straight, 1 = closed/curled
+ASL = {
+    'A': (1, 1, 1, 1, 1),   # fist, thumb on side
+    'B': (1, 0, 0, 0, 0),   # 4 fingers up, thumb across palm
+    'C': (0, 0, 0, 0, 0),   # curved (approximated as open)
+    'D': (1, 0, 1, 1, 1),   # index up, others closed
+    'E': (1, 1, 1, 1, 1),   # all curled
+    'F': (0, 1, 0, 0, 0),   # thumb+index touch (approximated)
+    'G': (0, 0, 1, 1, 1),   # sideways - approximated
+    'H': (1, 0, 0, 1, 1),   # sideways - approximated
+    'I': (1, 1, 1, 1, 0),   # pinky up only
+    'J': (1, 1, 1, 1, 0),   # like I (motion not possible)
+    'K': (0, 0, 0, 1, 1),   # index+middle up, thumb between
+    'L': (0, 0, 1, 1, 1),   # thumb+index L shape
+    'M': (1, 1, 1, 1, 1),   # thumb under three fingers (approximated)
+    'N': (1, 1, 1, 1, 1),   # thumb under two fingers (approximated)
+    'O': (0, 1, 1, 1, 1),   # round shape (approximated)
+    'P': (0, 0, 0, 1, 1),   # like K but downward (approximated)
+    'Q': (0, 0, 1, 1, 1),   # like G but downward (approximated)
+    'R': (1, 0, 0, 1, 1),   # crossed fingers (approximated)
+    'S': (1, 1, 1, 1, 1),   # fist with thumb across
+    'T': (1, 1, 1, 1, 1),   # thumb between index+middle (approximated)
+    'U': (1, 0, 0, 1, 1),   # index+middle up together
+    'V': (1, 0, 0, 1, 1),   # like U (spread not possible)
+    'W': (1, 0, 0, 0, 1),   # three middle fingers up
+    'X': (1, 1, 1, 1, 1),   # bent index (approximated as fist)
+    'Y': (0, 1, 1, 1, 0),   # thumb+pinky out
+    'Z': (1, 0, 1, 1, 1),   # like D (motion not possible)
+}
+
+def set_finger(i, state):
+    """state: 0 = open, 1 = closed"""
+    open_a, closed_a = RANGES[i]
+    target = closed_a if state == 1 else open_a
+    kit.servo[CHANNELS[i]].angle = target
+
+def sign_letter(letter):
+    letter = letter.upper()
+    if letter not in ASL:
+        return
+    print(f"Signing: {letter}")
+    pose = ASL[letter]
+    for i in range(5):
+        set_finger(i, pose[i])
+    time.sleep(0.9)
+
+def relax():
+    for i in range(5):
+        set_finger(i, 0)
+    time.sleep(0.4)
+
+def sign_word(word):
+    for ch in word:
+        if ch.isalpha():
+            sign_letter(ch)
+            relax()
+        else:
+            time.sleep(0.4)
+
+def main():
+    r = sr.Recognizer()
+    mic = sr.Microphone()
+    print("Calibrating microphone for ambient noise...")
+    with mic as source:
+        r.adjust_for_ambient_noise(source, duration=2)
+    print("Ready. Speak a word.")
+    relax()
+    while True:
+        try:
+            with mic as source:
+                print("Listening...")
+                audio = r.listen(source, timeout=5, phrase_time_limit=5)
+            text = r.recognize_google(audio)
+            print(f"Heard: {text}")
+            sign_word(text)
+        except sr.WaitTimeoutError:
+            continue
+        except sr.UnknownValueError:
+            print("Could not understand. Try again.")
+        except KeyboardInterrupt:
+            print("\\nExiting.")
+            relax()
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
+
+`,
+  },
+  {
+    part: 3,
+    step: 7,
+    title: 'Run the ASL hand script',
+    description: 'Paste into your terminal.',
+    content: `ashleypi@aslhand.local:~ $ python3 asl_hand.py
+`,
+  },
+]

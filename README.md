@@ -43,10 +43,11 @@ node scripts/export-manual-slides.mjs
 
 | Location | What to add |
 |----------|-------------|
-| `demoVideo.youtubeId` | Real YouTube video ID |
+| `demoVideo.src` | Path to demo video in `public/` (default: `demo.mov`) |
 | `manualParts` parts 4–7 | Full assembly, tendon, software, and calibration text |
 | `partsList[].href` | Vendor purchase links |
-| `downloads[].href` | STL zip, GitHub repo, PDF manual |
+| `stlFiles` / `pdfManual` | STL Google Drive link; PDF at `public/instructions-manual.pdf` |
+| `downloads[].href` | GitHub repo (code download still TODO) |
 | `getHelp.href` / `getHelp.email` | Dartmouth makerspace contact |
 
 ## Build for production

@@ -1,18 +1,13 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { springBouncy } from '../lib/motion'
 import { demoVideo } from '../data/manual'
+import { springBouncy } from '../lib/motion'
 import { SectionHeading } from './SectionHeading'
 
 export function DemoVideo() {
   const reduceMotion = useReducedMotion()
-  // TODO: Replace demoVideo.youtubeId in src/data/manual.ts with your real video ID
-  const embedUrl = `https://www.youtube.com/embed/${demoVideo.youtubeId}`
 
   return (
-    <section
-      className="section-padding bg-canvas"
-      aria-labelledby="demo-heading"
-    >
+    <section className="section-padding bg-canvas" aria-labelledby="demo-heading">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="demo"
@@ -28,15 +23,18 @@ export function DemoVideo() {
           viewport={{ once: true }}
           transition={springBouncy}
         >
-          {/* TODO: Update youtubeId in src/data/manual.ts */}
-          <div className="relative aspect-video w-full">
-            <iframe
-              className="absolute inset-0 h-full w-full"
-              src={embedUrl}
-              title="Build Buddy @ Dartmouth demo video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="relative aspect-video w-full bg-black">
+            <video
+              className="absolute inset-0 h-full w-full object-contain"
+              src={demoVideo.src}
+              controls
+              playsInline
+              preload="metadata"
+              aria-label="Build Buddy @ Dartmouth demo video"
+            >
+              Your browser does not support video playback. Download the demo from the project
+              repository.
+            </video>
           </div>
         </motion.div>
 

@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { dartmouthResources, type PrintingLocation } from '../data/manual'
+import { dartmouthResources, pdfManual, stlFiles, type PrintingLocation } from '../data/manual'
 import { springBouncy, staggerContainer, staggerItem } from '../lib/motion'
 import { MotionLink } from './MotionLink'
 import { SectionHeading } from './SectionHeading'
@@ -105,6 +105,42 @@ export function Resources() {
         </motion.p>
 
         <motion.div
+          className="mb-10 grid gap-4 sm:grid-cols-2"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={springBouncy}
+        >
+          <div className="card-pop flex flex-col gap-4 border-l-4 border-l-pop-coral sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold text-pop-ink">{stlFiles.label}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-pop-ink/75">{stlFiles.description}</p>
+            </div>
+            <a
+              href={stlFiles.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-pop shrink-0 px-5 py-2.5 text-center text-sm"
+            >
+              Open STL folder ↗
+            </a>
+          </div>
+          <div className="card-pop flex flex-col gap-4 border-l-4 border-l-pop-purple sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold text-pop-ink">{pdfManual.label}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-pop-ink/75">{pdfManual.description}</p>
+            </div>
+            <a
+              href={pdfManual.href}
+              download={pdfManual.downloadFilename}
+              className="btn-pop shrink-0 px-5 py-2.5 text-center text-sm"
+            >
+              Download PDF ↓
+            </a>
+          </div>
+        </motion.div>
+
+        <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="show"
@@ -162,10 +198,27 @@ export function Resources() {
           viewport={{ once: true }}
         >
           <p className="text-sm italic text-pop-ink/60">
-            Need parts, STLs, or the full wiring guide? Head to the{' '}
+            Need the full wiring guide and coding steps? Head to the{' '}
             <MotionLink to="/build-manual" className="font-bold text-pop-purple underline">
               Build Manual
             </MotionLink>
+            . Get{' '}
+            <a
+              href={stlFiles.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-pop-purple underline"
+            >
+              STL files
+            </a>{' '}
+            or the{' '}
+            <a
+              href={pdfManual.href}
+              download={pdfManual.downloadFilename}
+              className="font-bold text-pop-purple underline"
+            >
+              printable PDF manual
+            </a>
             .
           </p>
         </motion.div>
