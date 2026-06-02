@@ -1,14 +1,73 @@
 import {
   motion,
+  useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
-  useScroll,
   useTransform,
+  type MotionValue,
 } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { manualBook } from '../data/manual'
 
 const total = manualBook.slides.length
+const STICKY_TOP_RATIO = 0.1
+const STICKY_HEIGHT_RATIO = 0.8
+
+function usePinnedBookProgress(containerRef: React.RefObject<HTMLDivElement | null>) {
+  const progress = useMotionValue(0)
+
+  useLayoutEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    const update = () => {
+      const vh = window.innerHeight
+      const stickyTop = vh * STICKY_TOP_RATIO
+      const stickyHeight = vh * STICKY_HEIGHT_RATIO
+
+      const rect = el.getBoundingClientRect()
+      const elementTop = rect.top + window.scrollY
+      const pinStart = elementTop - stickyTop
+      const pinEnd = elementTop + el.offsetHeight - stickyHeight - stickyTop
+      const pinLength = Math.max(1, pinEnd - pinStart)
+
+      const p = Math.min(1, Math.max(0, (window.scrollY - pinStart) / pinLength))
+      progress.set(p)
+    }
+
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [containerRef, progress])
+
+  return progress
+}
+
+function useScrollTrackHeight() {
+  const [heightPx, setHeightPx] = useState<number | null>(null)
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const vh = window.innerHeight
+      const pageStep = vh * (manualBook.scrollHeightPerPage / 100)
+      const stickyTop = vh * STICKY_TOP_RATIO
+      const stickyHeight = vh * STICKY_HEIGHT_RATIO
+      // One scroll segment per page flip, plus room for sticky viewport
+      const pinLength = (total - 1) * pageStep
+      setHeightPx(Math.ceil(pinLength + stickyHeight + stickyTop))
+    }
+
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  return heightPx
+}
 
 function StaticManual({
   current,
@@ -50,15 +109,8 @@ function StaticManual({
   )
 }
 
-function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | null> }) {
-  const { scrollYProgress } = useScroll({
-    target: scrollRef,
-    // Use end-end so the sticky viewport has full runway
-    offset: ['start start', 'end end'],
-  })
-
-  // Map 0..1 progress to page turns 0..(total-1)
-  const pageFloat = useTransform(scrollYProgress, (v) => v * (total - 1))
+function FlipBook({ bookProgress }: { bookProgress: MotionValue<number> }) {
+  const pageFloat = useTransform(bookProgress, (v) => v * (total - 1))
 
   const rotateY = useTransform(pageFloat, (p) => {
     const idx = Math.min(total - 1, Math.max(0, Math.floor(p)))
@@ -84,6 +136,14 @@ function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | n
     setUnderIndex(t > 0.002 ? Math.min(total - 1, idx + 1) : idx)
   })
 
+  // Preload upcoming slides so later pages don't stall on slow networks (e.g. Vercel CDN)
+  useEffect(() => {
+    for (let i = topIndex; i <= Math.min(total - 1, topIndex + 3); i++) {
+      const img = new Image()
+      img.src = manualBook.slides[i].src
+    }
+  }, [topIndex])
+
   const top = manualBook.slides[topIndex]
   const under = manualBook.slides[underIndex]
 
@@ -103,19 +163,17 @@ function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | n
         />
 
         <div className="relative aspect-[16/10] w-full" style={{ transformStyle: 'preserve-3d' }}>
-          {/* Next page revealed as the current page turns */}
           <div className="absolute inset-0 overflow-hidden rounded-r-xl border-2 border-pop-ink/15 bg-white shadow-pop-sm">
             <img
               key={under.src}
               src={under.src}
               alt={under.alt}
               className="h-full w-full object-contain bg-white"
-              loading="lazy"
+              loading={underIndex < 4 ? 'eager' : 'lazy'}
               decoding="async"
             />
           </div>
 
-          {/* Turning page — no CSS filter here (breaks preserve-3d) */}
           <motion.div
             className="absolute inset-0"
             style={{
@@ -134,7 +192,7 @@ function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | n
                 src={top.src}
                 alt={top.alt}
                 className="h-full w-full object-contain bg-white"
-                loading={topIndex === 0 ? 'eager' : 'lazy'}
+                loading={topIndex < 4 ? 'eager' : 'lazy'}
                 decoding="async"
               />
               <motion.div
@@ -161,7 +219,9 @@ function FlipBook({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | n
 export function ManualBook() {
   const containerRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
-  const [currentPage, setCurrentPage] = useState(0) // reduced-motion viewer only
+  const [currentPage, setCurrentPage] = useState(0)
+  const scrollTrackHeightPx = useScrollTrackHeight()
+  const bookProgress = usePinnedBookProgress(containerRef)
 
   if (reduceMotion) {
     return (
@@ -184,12 +244,11 @@ export function ManualBook() {
 
       <div
         ref={containerRef}
-        // +100vh gives the sticky book room to finish the last flip
-        style={{ height: `${total * manualBook.scrollHeightPerPage + 100}vh` }}
+        style={{ height: scrollTrackHeightPx ?? `${total * manualBook.scrollHeightPerPage}vh` }}
         className="relative"
       >
         <div className="sticky top-[10vh] z-10 flex h-[80vh] items-center justify-center">
-          <FlipBook scrollRef={containerRef} />
+          <FlipBook bookProgress={bookProgress} />
         </div>
       </div>
 
