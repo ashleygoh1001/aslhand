@@ -1,60 +1,166 @@
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { siteMeta } from '../data/manual'
+import { motion, useReducedMotion } from 'framer-motion'
+import { helloSigns, siteMeta, type TaglineEmphasisStyle } from '../data/manual'
+import {
+  blobFloat,
+  floatDrift,
+  staggerContainer,
+  staggerItem,
+  springBouncy,
+  wiggleHover,
+} from '../lib/motion'
+import { MotionLink } from './MotionLink'
+
+const emphasizeStyles: Record<TaglineEmphasisStyle, string> = {
+  purple: 'font-bold italic text-pop-purple text-wavy decoration-pop-purple/50',
+  coral: 'font-bold italic text-pop-coral text-wavy decoration-pop-coral/50',
+}
+
+const blobs = [
+  { className: '-left-20 top-20 h-64 w-64 bg-pop-mint' },
+  { className: '-right-16 bottom-24 h-72 w-72 bg-pop-peach' },
+  { className: 'left-1/3 top-1/2 h-48 w-48 bg-pop-lemon' },
+]
+
+const titleParts = [
+  { text: 'Build Buddy', className: 'font-bold text-pop-ink' },
+  { text: '@', className: 'font-bold italic text-pop-teal' },
+  { text: 'Dartmouth', className: 'font-bold italic text-dartmouth-green' },
+]
 
 export function Hero() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <section
-      className="flex min-h-[85vh] items-center section-padding"
+      className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden section-padding text-center"
       aria-labelledby="hero-heading"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
-        {/* Waving hand — left of text, full opacity (no fade overlay) */}
+      {blobs.map((blob, i) => (
         <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="shrink-0"
+          key={i}
+          className={`hero-blob ${blob.className}`}
+          aria-hidden="true"
+          animate={reduceMotion ? undefined : blobFloat(i)}
+        />
+      ))}
+
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="mb-10 flex w-full max-w-5xl flex-nowrap items-end justify-center gap-1 sm:gap-2 md:gap-3"
+          aria-label="HELLO spelled in American Sign Language fingerspelling"
         >
-          <img
-            src="/hero-hand.gif"
-            alt="Animated ASL fingerspelling hand"
-            className="h-[min(40vh,320px)] w-auto object-contain opacity-100 sm:h-[min(55vh,420px)]"
-          />
+          {helloSigns.map((sign, index) => (
+            <motion.figure
+              key={`${sign.letter}-${index}`}
+              variants={staggerItem}
+              className="flex min-w-0 flex-1 cursor-default flex-col items-center"
+            >
+              <motion.div
+                animate={reduceMotion ? undefined : floatDrift(index)}
+                whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+                className="flex w-full flex-col items-center"
+              >
+              <motion.img
+                src={sign.src}
+                alt={sign.alt}
+                className="h-auto max-h-24 w-full object-contain sm:max-h-32 md:max-h-40 lg:max-h-48"
+                whileHover={reduceMotion ? undefined : wiggleHover}
+              />
+              <motion.figcaption
+                className={`mt-2 text-3xl font-bold italic sm:text-4xl md:text-5xl ${sign.color}`}
+                animate={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        scale: [1, 1.08, 1],
+                        transition: {
+                          duration: 1.8,
+                          repeat: Infinity,
+                          delay: index * 0.2,
+                          ease: 'easeInOut',
+                        },
+                      }
+                }
+              >
+                {sign.letter}
+              </motion.figcaption>
+              </motion.div>
+            </motion.figure>
+          ))}
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-col items-center text-center lg:items-start lg:text-left"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="relative flex max-w-3xl flex-col items-center"
         >
-          <p className="mb-4 inline-block rounded-full bg-canvas px-3 py-1 text-sm font-medium text-dartmouth-green shadow-sm ring-1 ring-dartmouth-green/20">
-            Dartmouth Student Build Project
-          </p>
-          <h1
-            id="hero-heading"
-            className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl"
+          <motion.p
+            variants={staggerItem}
+            className="text-lg font-medium italic tracking-wide text-pop-purple"
+            animate={
+              reduceMotion
+                ? undefined
+                : { opacity: [0.7, 1, 0.7], transition: { duration: 2.5, repeat: Infinity } }
+            }
           >
-            {siteMeta.title}
-          </h1>
-          <p className="mt-6 max-w-xl text-xl text-gray-700">{siteMeta.tagline}</p>
-          <p className="mt-4 max-w-xl text-base text-gray-600">{siteMeta.subhead}</p>
+            {siteMeta.welcomeLine}
+          </motion.p>
 
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:items-start">
-            <Link
-              to="/demo"
-              className="inline-flex items-center justify-center rounded-xl bg-dartmouth-green px-6 py-3 text-base font-semibold text-white shadow-md transition-colors hover:bg-dartmouth-green-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dartmouth-green"
-            >
-              Watch the demo
-            </Link>
-            <Link
-              to="/build-manual"
-              className="inline-flex items-center justify-center rounded-xl border-2 border-dartmouth-green bg-canvas px-6 py-3 text-base font-semibold text-dartmouth-green transition-colors hover:bg-dartmouth-green-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dartmouth-green"
-            >
-              Start building
-            </Link>
-          </div>
+          <motion.h1
+            id="hero-heading"
+            variants={staggerItem}
+            className="mt-2 flex flex-wrap items-center justify-center gap-x-2 text-4xl leading-tight sm:text-5xl lg:text-6xl"
+          >
+            {titleParts.map((part) => (
+              <motion.span
+                key={part.text}
+                className={part.className}
+                whileHover={reduceMotion ? undefined : { y: -4, scale: 1.05 }}
+                transition={springBouncy}
+              >
+                {part.text}
+              </motion.span>
+            ))}
+          </motion.h1>
+
+          <motion.p variants={staggerItem} className="mt-6 max-w-2xl text-xl leading-relaxed text-pop-ink/85">
+            {siteMeta.tagline.map((part, i) => {
+              if (part.emphasize && part.style) {
+                const style = part.style as TaglineEmphasisStyle
+                return (
+                  <motion.em
+                    key={i}
+                    className={`inline-block ${emphasizeStyles[style]}`}
+                    whileHover={reduceMotion ? undefined : { scale: 1.08, rotate: -2 }}
+                    transition={springBouncy}
+                  >
+                    {part.text}
+                  </motion.em>
+                )
+              }
+              return <span key={i}>{part.text}</span>
+            })}
+          </motion.p>
+
+          <motion.p variants={staggerItem} className="mt-4 max-w-2xl text-base italic text-pop-ink/60">
+            {siteMeta.subhead}
+          </motion.p>
+
+          <motion.div
+            variants={staggerItem}
+            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
+            <MotionLink to="/demo" className="btn-pop">
+              Watch the <span className="italic">demo</span>
+            </MotionLink>
+            <MotionLink to="/build-manual" className="btn-pop-outline">
+              Start <span className="italic text-pop-coral">building</span>
+            </MotionLink>
+          </motion.div>
         </motion.div>
       </div>
     </section>

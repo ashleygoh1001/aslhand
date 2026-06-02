@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,16 +11,81 @@
   }
 
   body {
-    @apply bg-canvas text-gray-900 antialiased;
+    @apply bg-canvas text-pop-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-pop-lemon text-pop-ink;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-dartmouth-green;
+    @apply outline-2 outline-offset-2 outline-pop-purple;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply px-4 py-16 sm:px-6 lg:px-8 lg:py-24;
+  }
+
+  .btn-pop {
+    @apply inline-flex items-center justify-center rounded-full border-2 border-pop-ink bg-pop-coral px-6 py-3 text-base font-bold text-white transition-all;
+    box-shadow: 4px 4px 0 0 #2d3142;
+  }
+
+  .btn-pop:hover {
+    @apply bg-pop-purple;
+    transform: translateY(-2px);
+    box-shadow: none;
+  }
+
+  .btn-pop-outline {
+    @apply inline-flex items-center justify-center rounded-full border-2 border-pop-ink bg-canvas px-6 py-3 text-base font-bold text-pop-ink transition-all;
+    box-shadow: 2px 2px 0 0 #2d3142;
+  }
+
+  .btn-pop-outline:hover {
+    @apply border-pop-teal text-pop-teal;
+    transform: translateY(-2px);
+    box-shadow: none;
+  }
+
+  .card-pop {
+    @apply rounded-3xl border-2 border-pop-ink bg-white p-6 transition-transform;
+    box-shadow: 2px 2px 0 0 #2d3142;
+  }
+
+  .card-pop:hover {
+    transform: translateY(-4px);
+  }
+
+  .text-wavy {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-underline-offset: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 @layer utilities {
-  .section-padding {
-    @apply px-4 py-16 sm:px-6 lg:px-8 lg:py-24;
+  .hero-blob {
+    @apply pointer-events-none absolute rounded-full opacity-40 blur-3xl;
+  }
+
+  .shadow-pop {
+    box-shadow: 4px 4px 0 0 #2d3142;
+  }
+
+  .shadow-pop-sm {
+    box-shadow: 2px 2px 0 0 #2d3142;
   }
 }

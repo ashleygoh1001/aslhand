@@ -1,26 +1,28 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import type { Callout as CalloutType } from '../data/manual'
+import { springBouncy } from '../lib/motion'
 
 const styles = {
   warning: {
-    border: 'border-amber-500',
-    bg: 'bg-amber-50',
+    border: 'border-pop-coral',
+    bg: 'bg-pop-peach/40',
     icon: '⚠️',
-    title: 'text-amber-900',
-    body: 'text-amber-800',
+    title: 'font-bold italic text-pop-coral',
+    body: 'text-pop-ink/80',
   },
   caution: {
-    border: 'border-orange-500',
-    bg: 'bg-orange-50',
+    border: 'border-pop-lemon',
+    bg: 'bg-pop-lemon/30',
     icon: '⚡',
-    title: 'text-orange-900',
-    body: 'text-orange-800',
+    title: 'font-bold italic text-pop-ink',
+    body: 'text-pop-ink/80',
   },
   info: {
-    border: 'border-dartmouth-green',
-    bg: 'bg-dartmouth-green-light',
+    border: 'border-pop-teal',
+    bg: 'bg-pop-mint/50',
     icon: 'ℹ️',
-    title: 'text-dartmouth-green-dark',
-    body: 'text-gray-700',
+    title: 'font-bold italic text-pop-teal',
+    body: 'text-pop-ink/80',
   },
 }
 
@@ -30,20 +32,34 @@ interface CalloutProps {
 
 export function Callout({ callout }: CalloutProps) {
   const s = styles[callout.type]
+  const reduceMotion = useReducedMotion()
 
   return (
-    <aside
-      className={`my-4 flex gap-3 rounded-r-lg border-l-4 ${s.border} ${s.bg} p-4`}
+    <motion.aside
+      className={`my-4 flex gap-3 rounded-2xl border-2 border-pop-ink/10 border-l-4 ${s.border} ${s.bg} p-4`}
       role="note"
       aria-label={`${callout.type}: ${callout.title}`}
+      initial={reduceMotion ? false : { opacity: 0, x: -24, rotate: -1 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, x: 0, rotate: 0 }}
+      viewport={{ once: true }}
+      transition={springBouncy}
+      whileHover={reduceMotion ? undefined : { scale: 1.01, x: 4 }}
     >
-      <span className="text-xl shrink-0" aria-hidden="true">
+      <motion.span
+        className="shrink-0 text-xl"
+        aria-hidden="true"
+        animate={
+          reduceMotion
+            ? undefined
+            : { rotate: [0, 10, -10, 0], transition: { duration: 2, repeat: Infinity } }
+        }
+      >
         {s.icon}
-      </span>
+      </motion.span>
       <div>
-        <p className={`font-semibold ${s.title}`}>{callout.title}</p>
+        <p className={s.title}>{callout.title}</p>
         <p className={`mt-1 text-sm leading-relaxed ${s.body}`}>{callout.body}</p>
       </div>
-    </aside>
+    </motion.aside>
   )
 }

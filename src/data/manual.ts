@@ -63,20 +63,62 @@ export interface DownloadItem {
   href: string
 }
 
+export type TaglineEmphasisStyle = 'purple' | 'coral'
+
 export const siteMeta = {
-  title: 'Voice-Controlled ASL Fingerspelling Hand',
-  tagline:
-    'From a bag of parts to a hand that signs the alphabet when you talk to it.',
+  welcomeLine: 'This is',
+  title: 'Build Buddy @ Dartmouth',
+  tagline: [
+    { text: 'Teaching Dartmouth HCD minors how to ' },
+    { text: 'design', emphasize: true, style: 'purple' },
+    { text: ' and ' },
+    { text: 'build', emphasize: true, style: 'coral' },
+    { text: ' with physical parts' },
+  ],
   subhead:
-    'A Dartmouth student build project · ~12–20 hour build · No prior engineering experience required',
+    '~12–20 hour build · No prior engineering experience required',
 }
+
+/** ASL fingerspelling sequence on the landing page — spells HELLO in order */
+export const helloSigns = [
+  {
+    letter: 'H',
+    src: '/hello/h.png',
+    alt: 'ASL letter H — index and middle fingers extended',
+    color: 'text-pop-purple',
+  },
+  {
+    letter: 'E',
+    src: '/hello/e.png',
+    alt: 'ASL letter E — fingers curled, thumb tucked',
+    color: 'text-pop-coral',
+  },
+  {
+    letter: 'L',
+    src: '/hello/l-1.png',
+    alt: 'ASL letter L — index up, thumb out',
+    color: 'text-pop-teal',
+  },
+  {
+    letter: 'L',
+    src: '/hello/l-2.png',
+    alt: 'ASL letter L — index up, thumb out',
+    color: 'text-dartmouth-green',
+  },
+  {
+    letter: 'O',
+    src: '/hello/o.png',
+    alt: 'ASL letter O — thumb and index form a circle',
+    color: 'text-pop-lemon',
+  },
+] as const
 
 export const navLinks: NavLink[] = [
   { path: '/', label: 'Home' },
   { path: '/demo', label: 'Demo' },
   { path: '/how-it-works', label: 'How It Works' },
   { path: '/build-manual', label: 'Build Manual' },
-  { path: '/resources', label: 'Resources' },
+  { path: '/resources', label: 'Dartmouth Resources' },
 ]
 
 // TODO: Replace with your real YouTube video ID
@@ -142,7 +184,7 @@ export const manualParts: ManualSection[] = [
     title: 'Part 1: Parts Checklist',
     summary: 'Gather everything before you start. Check off each item as you unpack it.',
     paragraphs: [
-      'Lay out all components on a clean workspace. Verify quantities against the Resources section below. Missing a single M3 screw can stall assembly for a day.',
+      'Lay out all components on a clean workspace. Verify quantities against the parts list on the Dartmouth Resources page and below. Missing a single M3 screw can stall assembly for a day.',
       'Keep small parts in labeled bags. The tendon routing step is much easier if you do not mix up left-hand and right-hand print files.',
     ],
     table: {
@@ -157,7 +199,7 @@ export const manualParts: ManualSection[] = [
         ['Jumper wires (male–female)', '20', '☐'],
         ['Braided fishing line (20–30 lb test)', '1 spool', '☐'],
         ['M3 screws & nuts assortment', '1 kit', '☐'],
-        ['3D-printed hand parts (see Resources)', '1 set', '☐'],
+        ['3D-printed hand parts (see Dartmouth Resources)', '1 set', '☐'],
       ],
     },
     callouts: [
@@ -408,11 +450,82 @@ export const downloads: DownloadItem[] = [
   },
 ]
 
-export const getHelp = {
-  title: 'Get help at Dartmouth',
-  description:
-    'Stuck on a step? Visit the Dartmouth makerspace for hands-on help with 3D printing, soldering, and Pi setup.',
-  linkLabel: 'Dartmouth Makerspace', // TODO: replace with real link text
-  href: '#', // TODO: Dartmouth makerspace URL or contact email
-  email: 'makerspace@dartmouth.edu', // TODO: replace with real contact
+export interface PrintingLocation {
+  id: string
+  name: string
+  summary: string
+  address: string
+  building: string
+  /** Google Maps embed URL — TODO: swap for a custom campus map image if you prefer */
+  mapEmbedUrl: string
+  websiteHref: string
+  websiteLabel: string
+  email?: string
+  highlights: string[]
+}
+
+export const dartmouthResources = {
+  title: 'Dartmouth Resources',
+  subtitle:
+    'Where to 3D print your hand parts on campus — equipment, people, and how to find the makerspace.',
+  intro:
+    'Every piece of this build that isn’t ordered online comes off a 3D printer. Dartmouth has two great options at Thayer: the Cable Makerspace for walk-in, self-serve printing with student TAs, and the MShop (Engineering Machine Shop) for staff-assisted PLA prints through an online queue.',
+  steps: [
+    {
+      title: 'Review your STL files',
+      body: 'Download the hand print files from the Build Manual downloads section (or your course folder). Check that each part is oriented for minimal supports.',
+    },
+    {
+      title: 'Pick a printing location',
+      body: 'Cable Makerspace — best for first-time makers who want hands-on help at the printer. MShop — best if you prefer to submit files online and pick up finished parts from Cummings Hall (typical lead time ~3–4 workdays).',
+    },
+    {
+      title: 'Get oriented',
+      body: 'At Cable Makerspace, walk in during open hours for a safety intro and slicing help. At MShop, submit your STLs through the online print request form and watch for email when parts are ready.',
+    },
+    {
+      title: 'Print & pick up',
+      body: 'A full hand set takes several hours of print time. Plan ahead — especially if using the MShop queue during busy weeks.',
+    },
+  ],
+  locations: [
+    {
+      id: 'cable-makerspace',
+      name: 'Harold Edward Cable Makerspace',
+      summary:
+        'Open to all Dartmouth students, faculty, and staff. Laser cutters, Prusa 3D printers, hand tools, and CAD workstations — staffed by trained student TAs.',
+      address: '15 Thayer Drive, Suite 003, Hanover, NH 03755',
+      building:
+        'Ground floor, Class of 1982 Engineering & Computer Science Center (ECSC) — just off the atrium',
+      mapEmbedUrl:
+        'https://www.google.com/maps?q=Harold+Edward+Cable+Makerspace,+15+Thayer+Drive,+Hanover,+NH+03755&output=embed',
+      websiteHref: 'https://engineering.dartmouth.edu/community/makerspace',
+      websiteLabel: 'Cable Makerspace website',
+      highlights: [
+        'Prusa MK3S+ 3D printers (PLA)',
+        'Prusa Slicer & CAD workstations on site',
+        'Student tech instructors for hands-on help',
+        'Walk-in during open hours — no engineering major required',
+      ],
+    },
+    {
+      id: 'mshop',
+      name: 'MShop (Dartmouth Engineering Machine Shop)',
+      summary:
+        'Thayer’s full machine shop and makerspace. Submit PLA parts through an online queue; staff run the printers and email you when parts are ready for pickup.',
+      address: 'Cummings Hall, 15 Thayer Drive, Hanover, NH 03755',
+      building: 'Lower level, Cummings Hall (C025 area) — pickup cubbies outside the shop',
+      mapEmbedUrl:
+        'https://www.google.com/maps?q=Dartmouth+Engineering+Machine+Shop,+Cummings+Hall,+Hanover,+NH+03755&output=embed',
+      websiteHref: 'https://sites.dartmouth.edu/mshop/',
+      websiteLabel: 'MShop website & print request',
+      email: 'mshop@thayer.dartmouth.edu',
+      highlights: [
+        'Online PLA print submission (Prusa printers)',
+        'Staff-operated queue — ~3–4 workday lead time advised',
+        'Pickup in cubbies outside MShop or a location you choose',
+        'Also offers laser cutting, CNC, welding, and training sessions',
+      ],
+    },
+  ] satisfies PrintingLocation[],
 }

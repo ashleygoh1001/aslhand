@@ -1,4 +1,4 @@
-# Voice-Controlled ASL Fingerspelling Hand
+# Build Buddy @ Dartmouth
 
 A multi-page site to help Dartmouth students build a 3D-printed robotic hand that listens through a microphone and signs the alphabet in American Sign Language fingerspelling.
 
@@ -10,7 +10,7 @@ A multi-page site to help Dartmouth students build a 3D-printed robotic hand tha
 | `/demo` | Demo video |
 | `/how-it-works` | System explainer |
 | `/build-manual` | Step-by-step build guide |
-| `/resources` | Parts, tools, downloads |
+| `/resources` | Dartmouth Resources — 3D printing help & campus map |
 
 ## Quick start
 

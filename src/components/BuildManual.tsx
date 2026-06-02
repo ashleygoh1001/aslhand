@@ -1,4 +1,6 @@
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useId, useState } from 'react'
+import { springBouncy } from '../lib/motion'
 import type { ManualSection } from '../data/manual'
 import { Callout } from './Callout'
 import { CodeBlock } from './CodeBlock'
@@ -12,9 +14,16 @@ interface AccordionItemProps {
 function AccordionItem({ section, isOpen, onToggle }: AccordionItemProps) {
   const panelId = useId()
   const buttonId = useId()
+  const reduceMotion = useReducedMotion()
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <motion.div
+      className="shadow-pop-sm overflow-hidden rounded-3xl border-2 border-pop-ink bg-white"
+      layout
+      initial={false}
+      whileHover={reduceMotion ? undefined : { scale: 1.005 }}
+      transition={springBouncy}
+    >
       <h3>
         <button
           id={buttonId}
@@ -26,13 +35,13 @@ function AccordionItem({ section, isOpen, onToggle }: AccordionItemProps) {
         >
           <span className="flex items-center gap-3">
             <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-dartmouth-green text-sm font-bold text-white"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-pop-purple text-sm font-bold italic text-white"
               aria-hidden="true"
             >
               {section.id.replace('part-', '')}
             </span>
             <span>
-              <span className="block text-lg font-semibold text-gray-900">
+              <span className="block text-lg font-bold text-pop-ink">
                 {section.title}
                 {section.placeholder && (
                   <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
@@ -59,13 +68,18 @@ function AccordionItem({ section, isOpen, onToggle }: AccordionItemProps) {
         </button>
       </h3>
 
-      <div
-        id={panelId}
-        role="region"
-        aria-labelledby={buttonId}
-        hidden={!isOpen}
-        className={isOpen ? 'border-t border-gray-100 px-6 py-5' : 'hidden'}
-      >
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={buttonId}
+            initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+            animate={reduceMotion ? undefined : { height: 'auto', opacity: 1 }}
+            exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
+            transition={springBouncy}
+            className="overflow-hidden border-t border-gray-100 px-6 py-5"
+          >
         {section.paragraphs?.map((p, i) => (
           <p key={i} className="mb-4 leading-relaxed text-gray-700 last:mb-0">
             {p}
@@ -158,8 +172,10 @@ function AccordionItem({ section, isOpen, onToggle }: AccordionItemProps) {
         {section.callouts?.map((callout, i) => (
           <Callout key={i} callout={callout} />
         ))}
-      </div>
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

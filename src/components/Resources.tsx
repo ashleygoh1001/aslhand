@@ -1,152 +1,173 @@
-import { motion } from 'framer-motion'
-import {
-  downloads,
-  getHelp,
-  partsList,
-  toolsList,
-} from '../data/manual'
+import { motion, useReducedMotion } from 'framer-motion'
+import { dartmouthResources, type PrintingLocation } from '../data/manual'
+import { springBouncy, staggerContainer, staggerItem } from '../lib/motion'
+import { MotionLink } from './MotionLink'
 import { SectionHeading } from './SectionHeading'
 
+const borderAccents = ['border-l-pop-coral', 'border-l-pop-purple'] as const
+
+function LocationBlock({
+  location,
+  accentClass,
+}: {
+  location: PrintingLocation
+  accentClass: string
+}) {
+  return (
+    <article className="grid gap-6 lg:grid-cols-5 lg:gap-8">
+      <div className="lg:col-span-3">
+        <div className="shadow-pop overflow-hidden rounded-3xl border-2 border-pop-ink bg-white">
+          <div className="relative aspect-[4/3] w-full sm:aspect-video">
+            <iframe
+              title={`Map showing ${location.name} at Dartmouth`}
+              src={location.mapEmbedUrl}
+              className="absolute inset-0 h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <p className="border-t-2 border-pop-ink/10 bg-pop-mint/30 px-4 py-3 text-center text-sm italic text-pop-ink/70">
+            {location.name}
+          </p>
+        </div>
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`}
+          className="mt-3 inline-block text-sm font-medium text-pop-teal underline underline-offset-2 hover:text-pop-purple"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open in Google Maps ↗
+        </a>
+      </div>
+
+      <div className={`card-pop lg:col-span-2 border-l-4 ${accentClass}`}>
+        <h4 className="text-lg font-bold text-pop-ink">{location.name}</h4>
+        <p className="mt-2 text-sm leading-relaxed text-pop-ink/75">{location.summary}</p>
+        <address className="mt-4 not-italic text-sm text-pop-ink/85">
+          <span className="block font-semibold">{location.building}</span>
+          <span className="mt-1 block">{location.address}</span>
+        </address>
+        <ul className="mt-4 space-y-2">
+          {location.highlights.map((item) => (
+            <li key={item} className="flex gap-2 text-sm text-pop-ink/80">
+              <span className="font-bold text-pop-teal" aria-hidden="true">
+                →
+              </span>
+              {item}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 flex flex-col gap-3">
+          <a
+            href={location.websiteHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pop px-5 py-2.5 text-sm text-center"
+          >
+            {location.websiteLabel}
+          </a>
+          {location.email && (
+            <a
+              href={`mailto:${location.email}`}
+              className="text-center text-sm font-medium text-dartmouth-green underline underline-offset-2"
+            >
+              {location.email}
+            </a>
+          )}
+        </div>
+      </div>
+    </article>
+  )
+}
+
 export function Resources() {
+  const reduceMotion = useReducedMotion()
+  const { locations, steps } = dartmouthResources
+
   return (
     <section className="section-padding bg-canvas" aria-labelledby="resources-heading">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="resources"
-          title="Resources"
-          subtitle="Parts, tools, downloads, and where to get help on campus."
+          title={dartmouthResources.title}
+          subtitle={dartmouthResources.subtitle}
         />
 
-        {/* Parts list */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
+        <motion.p
+          className="mb-10 max-w-3xl text-lg leading-relaxed text-pop-ink/85"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
+          transition={springBouncy}
         >
-          <h3 className="mb-4 text-xl font-semibold text-gray-900">Parts list</h3>
-          <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <caption className="sr-only">Required parts for the ASL fingerspelling hand build</caption>
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-900">
-                    Item
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-900">
-                    Qty
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-900">
-                    What it&apos;s for
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {partsList.map((part, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {/* TODO: Replace href="#" with real vendor links in src/data/manual.ts */}
-                      {part.href ? (
-                        <a
-                          href={part.href}
-                          className="text-dartmouth-green underline decoration-dartmouth-green/30 underline-offset-2 hover:decoration-dartmouth-green"
-                        >
-                          {part.item}
-                        </a>
-                      ) : (
-                        part.item
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-gray-700">
-                      {part.quantity}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{part.purpose}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
+          {dartmouthResources.intro}
+        </motion.p>
 
-        {/* Tools */}
         <motion.div
-          className="mt-12"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-40px' }}
         >
-          <h3 className="mb-4 text-xl font-semibold text-gray-900">Tools you&apos;ll need</h3>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {toolsList.map((tool, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm"
-              >
-                <span className="mt-0.5 text-dartmouth-green" aria-hidden="true">
-                  ✓
-                </span>
-                {tool}
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-
-        {/* Downloads */}
-        <motion.div
-          className="mt-12"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-        >
-          <h3 className="mb-4 text-xl font-semibold text-gray-900">Downloads</h3>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {downloads.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dartmouth-green"
-              >
-                {/* TODO: Update download hrefs in src/data/manual.ts */}
-                <span className="text-sm font-semibold text-dartmouth-green group-hover:underline">
-                  {item.label} ↓
-                </span>
-                <span className="mt-2 text-sm text-gray-600">{item.description}</span>
-              </a>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Get help */}
-        <motion.div
-          className="mt-12 rounded-2xl border border-dartmouth-green/20 bg-dartmouth-green-light p-6 sm:p-8"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <h3 className="text-xl font-semibold text-dartmouth-green-dark">
-            {getHelp.title}
+          <h3 className="mb-6 text-xl font-bold italic text-pop-purple">
+            How to get help with 3D printing
           </h3>
-          <p className="mt-2 max-w-2xl text-gray-700">{getHelp.description}</p>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-            {/* TODO: Replace getHelp.href with real Dartmouth makerspace URL */}
-            <a
-              href={getHelp.href}
-              className="inline-flex items-center justify-center rounded-lg bg-dartmouth-green px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-dartmouth-green-dark"
-            >
-              {getHelp.linkLabel}
-            </a>
-            {getHelp.email && (
-              <a
-                href={`mailto:${getHelp.email}`}
-                className="text-sm font-medium text-dartmouth-green underline underline-offset-2 hover:text-dartmouth-green-dark"
+          <ol className="space-y-4">
+            {steps.map((step, index) => (
+              <motion.li
+                key={step.title}
+                variants={staggerItem}
+                className="card-pop flex gap-4 border-l-4 border-l-pop-teal"
               >
-                {getHelp.email}
-              </a>
-            )}
-          </div>
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pop-purple text-lg font-bold italic text-white"
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+                <div>
+                  <h4 className="font-bold text-pop-ink">{step.title}</h4>
+                  <p className="mt-1 text-sm leading-relaxed text-pop-ink/75">{step.body}</p>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+        </motion.div>
+
+        <motion.div
+          className="mt-14 space-y-16"
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={springBouncy}
+        >
+          <h3 className="text-xl font-bold italic text-pop-coral">
+            Places to go for 3D printing
+          </h3>
+
+          {locations.map((location, index) => (
+            <LocationBlock
+              key={location.id}
+              location={location}
+              accentClass={borderAccents[index % borderAccents.length]}
+            />
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="mt-12 text-center"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <p className="text-sm italic text-pop-ink/60">
+            Need parts, STLs, or the full wiring guide? Head to the{' '}
+            <MotionLink to="/build-manual" className="font-bold text-pop-purple underline">
+              Build Manual
+            </MotionLink>
+            .
+          </p>
         </motion.div>
       </div>
     </section>
